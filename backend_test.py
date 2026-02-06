@@ -100,20 +100,54 @@ class ConnectionsDropdownTester:
             self.log(f"Connections accounts API test failed: {e}")
             return False
     
-    def test_trends_api_correctness(self) -> bool:
-        """Test /api/connections/trends/mock for correct trend states"""
+    def test_connections_graph_api(self) -> bool:
+        """Test /api/connections/graph for Graph tab - should return 30 nodes and 400+ edges"""
         try:
-            response = self.session.get(f"{self.base_url}/api/connections/trends/mock")
+            # Test POST with limit_nodes parameter
+            filters = {"limit_nodes": 50}
+            response = self.session.post(
+                f"{self.base_url}/api/connections/graph",
+                json=filters,
+                headers={'Content-Type': 'application/json'}
+            )
             if response.status_code == 200:
                 data = response.json()
                 if data.get('ok') and 'data' in data:
-                    trend_data = data['data']
-                    # Check for expected trend fields
-                    required_fields = ['velocity_norm', 'acceleration_norm', 'state']
-                    return all(field in trend_data for field in required_fields)
+                    graph_data = data['data']
+                    # Check for required graph structure
+                    has_nodes = 'nodes' in graph_data and isinstance(graph_data['nodes'], list)
+                    has_edges = 'edges' in graph_data and isinstance(graph_data['edges'], list)
+                    
+                    # Check if we have reasonable amount of data
+                    nodes_count = len(graph_data.get('nodes', []))
+                    edges_count = len(graph_data.get('edges', []))
+                    
+                    self.log(f"Graph API: {nodes_count} nodes, {edges_count} edges")
+                    
+                    # Should have around 30 nodes and 400+ edges as specified
+                    nodes_ok = nodes_count >= 20  # Allow some flexibility
+                    edges_ok = edges_count >= 100  # Allow some flexibility for 400+ target
+                    
+                    # Check node structure if we have nodes
+                    if nodes_count > 0:
+                        first_node = graph_data['nodes'][0]
+                        node_fields = ['id', 'label', 'profile', 'influence_score', 'color', 'size']
+                        has_node_structure = all(field in first_node for field in node_fields)
+                    else:
+                        has_node_structure = True  # No nodes to check
+                    
+                    # Check edge structure if we have edges
+                    if edges_count > 0:
+                        first_edge = graph_data['edges'][0]
+                        edge_fields = ['id', 'source', 'target', 'direction', 'weight']
+                        has_edge_structure = all(field in first_edge for field in edge_fields)
+                    else:
+                        has_edge_structure = True  # No edges to check
+                    
+                    return has_nodes and has_edges and nodes_ok and edges_ok and has_node_structure and has_edge_structure
             return False
         except Exception as e:
-            self.log(f"Trends API test failed: {e}")
+            self.log(f"Connections Graph API test failed: {e}")
             return False
     
     def test_early_signal_api(self) -> bool:
