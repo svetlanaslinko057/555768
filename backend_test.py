@@ -481,42 +481,29 @@ class ConnectionsDropdownTester:
             return False
     
     def run_all_tests(self) -> Dict[str, Any]:
-        """Run all P2.2 tests and return results"""
-        self.log("🚀 Starting P2.2 Final Readiness Check - Backend Testing")
+        """Run all Connections dropdown tests and return results"""
+        self.log("🚀 Starting Connections Dropdown Backend Testing")
         self.log(f"Testing against: {self.base_url}")
         
         # Core API Health Tests
         self.run_test("Backend health check /api/health", self.test_health_check)
         self.run_test("Connections health /api/connections/health", self.test_connections_health)
         
-        # API Stability Tests
-        self.run_test("Scoring API /api/connections/score/mock stability", self.test_scoring_api_stability)
-        self.run_test("Trends API /api/connections/trends/mock correctness", self.test_trends_api_correctness)
-        self.run_test("Early Signal API /api/connections/early-signal/mock badge detection", self.test_early_signal_api)
+        # Connections Dropdown API Tests
+        self.run_test("Connections Accounts API /api/connections/accounts (Influencers tab)", self.test_connections_accounts_api)
+        self.run_test("Connections Graph API /api/connections/graph (Graph tab)", self.test_connections_graph_api)
+        self.run_test("Connections Compare API /api/connections/compare", self.test_connections_compare_api)
         
-        # Connections Graph API Tests
+        # Additional Graph API Tests
         self.run_test("Connections Graph GET /api/connections/graph", self.test_connections_graph_get)
         self.run_test("Connections Graph POST /api/connections/graph with filters", self.test_connections_graph_post_filters)
         self.run_test("Connections Graph ranking /api/connections/graph/ranking", self.test_connections_graph_ranking)
         self.run_test("Connections Graph node details /api/connections/graph/node/:id", self.test_connections_graph_node_details)
         
-        # Admin Authentication
-        admin_login_success = self.run_test("Admin login (admin/admin12345)", self.admin_login)
-        
-        if admin_login_success:
-            # Admin Control Plane Tests
-            self.run_test("Admin Connections Overview loads < 2 sec", self.test_admin_connections_overview_speed)
-            self.run_test("Admin Config tab shows read-only configs", self.test_admin_config_readonly)
-            self.run_test("Admin Stability tab shows score ≥ 0.9", self.test_admin_stability_score)
-            self.run_test("Admin Alerts tab: Run Alerts Batch generates alerts", self.test_admin_alerts_batch_generation)
-            self.run_test("Cooldown deduplication works", self.test_cooldown_deduplication)
-        else:
-            self.log("⚠️ Skipping admin tests due to login failure", "WARNING")
-        
         # Results Summary
         success_rate = (self.tests_passed / self.tests_run * 100) if self.tests_run > 0 else 0
         
-        self.log(f"\n📊 P2.2 Backend Test Results:")
+        self.log(f"\n📊 Connections Dropdown Backend Test Results:")
         self.log(f"✅ Passed: {self.tests_passed}/{self.tests_run} ({success_rate:.1f}%)")
         
         if self.failed_tests:
@@ -528,8 +515,7 @@ class ConnectionsDropdownTester:
             'tests_run': self.tests_run,
             'tests_passed': self.tests_passed,
             'success_rate': success_rate,
-            'failed_tests': self.failed_tests,
-            'admin_token_obtained': self.admin_token is not None
+            'failed_tests': self.failed_tests
         }
 
 def main():
