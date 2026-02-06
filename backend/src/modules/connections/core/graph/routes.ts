@@ -118,18 +118,24 @@ export async function connectionsGraphRoutes(fastify: FastifyInstance): Promise<
       const accountsColl = db.collection('connections_accounts');
       const scoreColl = db.collection('connections_scores');
       
-      // Get account
-      const account = await accountsColl.findOne({ author_id: id }) as any;
+      // Get accounts from database or use mock data
+      const allAccounts = await accountsColl.find({}).limit(100).toArray();
+      const accountsData = allAccounts.length > 0 ? allAccounts : generateMockAccounts(30);
+      
+      // Find account in the data
+      const account = accountsData.find((acc: any) => acc.author_id === id);
       if (!account) {
         return reply.status(404).send({ ok: false, error: 'Node not found' });
       }
       
-      // Get score data
-      const scoreData = await scoreColl.findOne({ author_id: id }) as any;
+      // Get score data (from database if available, otherwise use account data)
+      let scoreData = null;
+      if (allAccounts.length > 0) {
+        scoreData = await scoreColl.findOne({ author_id: id }) as any;
+      }
       
       // Build full graph to find connections
-      const allAccounts = await accountsColl.find({}).limit(100).toArray();
-      const graph = buildConnectionsGraph(allAccounts as any[], {});
+      const graph = buildConnectionsGraph(accountsData as any[], {});
       
       // Find edges connected to this node
       const connectedEdges = graph.edges.filter(
