@@ -23,7 +23,9 @@ import {
   Eye,
   RefreshCw,
   Info,
-  Scale
+  Scale,
+  Users,
+  Network
 } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import CompareModal from '../components/connections/CompareModal';
