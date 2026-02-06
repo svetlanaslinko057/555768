@@ -46,7 +46,7 @@ export function Sidebar({ globalState }) {
       ]
     },
     { path: '/', label: 'Dashboard', icon: '🏠' },
-    // Connections group with children (Influencers + Graph)
+    // Connections group with children (Influencers + Graph + Radar)
     { 
       id: 'connections',
       label: 'Connections', 
@@ -54,6 +54,7 @@ export function Sidebar({ globalState }) {
       children: [
         { path: '/connections', label: 'Influencers', icon: '👥' },
         { path: '/connections/graph', label: 'Graph', icon: '🕸️' },
+        { path: '/connections/radar', label: 'Radar', icon: '📡' },
       ]
     },
   ];
