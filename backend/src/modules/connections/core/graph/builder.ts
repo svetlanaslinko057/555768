@@ -160,10 +160,10 @@ export function buildConnectionsGraph(
         const strength = getEdgeStrengthCategory(weight);
         const direction = getEdgeDirection(scoreA, scoreB);
         
-        // Apply edge filters
-        if (filters.edge_strength && !filters.edge_strength.includes(strength)) continue;
+        // Apply edge filters (empty array = no filter)
+        if (filters.edge_strength?.length && !filters.edge_strength.includes(strength)) continue;
         if (filters.overlap_min && overlap < filters.overlap_min) continue;
-        if (filters.direction && !filters.direction.includes(direction)) continue;
+        if (filters.direction?.length && !filters.direction.includes(direction)) continue;
         
         edges.push({
           id: `${accountA.author_id}-${accountB.author_id}`,
