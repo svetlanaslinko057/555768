@@ -136,6 +136,115 @@ class P22BackendTester:
             self.log(f"Early Signal API test failed: {e}")
             return False
     
+    def test_connections_graph_get(self) -> bool:
+        """Test GET /api/connections/graph returns nodes and edges"""
+        try:
+            response = self.session.get(f"{self.base_url}/api/connections/graph")
+            if response.status_code == 200:
+                data = response.json()
+                if data.get('ok') and 'data' in data:
+                    graph_data = data['data']
+                    # Check for required graph structure
+                    has_nodes = 'nodes' in graph_data and isinstance(graph_data['nodes'], list)
+                    has_edges = 'edges' in graph_data and isinstance(graph_data['edges'], list)
+                    has_meta = 'meta' in graph_data
+                    
+                    # Check if we have reasonable amount of data
+                    nodes_count = len(graph_data.get('nodes', []))
+                    edges_count = len(graph_data.get('edges', []))
+                    
+                    self.log(f"Graph GET: {nodes_count} nodes, {edges_count} edges")
+                    return has_nodes and has_edges and has_meta and nodes_count > 0
+            return False
+        except Exception as e:
+            self.log(f"Connections Graph GET test failed: {e}")
+            return False
+    
+    def test_connections_graph_post_filters(self) -> bool:
+        """Test POST /api/connections/graph with filters"""
+        try:
+            filters = {
+                "profiles": ["whale", "influencer"],
+                "limit_nodes": 20,
+                "edge_strength": ["high", "medium"]
+            }
+            response = self.session.post(
+                f"{self.base_url}/api/connections/graph",
+                json=filters,
+                headers={'Content-Type': 'application/json'}
+            )
+            if response.status_code == 200:
+                data = response.json()
+                if data.get('ok') and 'data' in data:
+                    graph_data = data['data']
+                    nodes_count = len(graph_data.get('nodes', []))
+                    edges_count = len(graph_data.get('edges', []))
+                    
+                    self.log(f"Graph POST with filters: {nodes_count} nodes, {edges_count} edges")
+                    # Should have nodes and edges, and respect limit
+                    return nodes_count > 0 and nodes_count <= 20 and edges_count >= 0
+            return False
+        except Exception as e:
+            self.log(f"Connections Graph POST filters test failed: {e}")
+            return False
+    
+    def test_connections_graph_ranking(self) -> bool:
+        """Test GET /api/connections/graph/ranking returns ranking"""
+        try:
+            response = self.session.get(f"{self.base_url}/api/connections/graph/ranking?limit=10")
+            if response.status_code == 200:
+                data = response.json()
+                if data.get('ok') and 'data' in data:
+                    ranking_data = data['data']
+                    # Check for ranking structure
+                    has_items = 'items' in ranking_data and isinstance(ranking_data['items'], list)
+                    has_sort_by = 'sort_by' in ranking_data
+                    has_total = 'total' in ranking_data
+                    
+                    items_count = len(ranking_data.get('items', []))
+                    self.log(f"Graph ranking: {items_count} items")
+                    
+                    return has_items and has_sort_by and has_total and items_count > 0
+            return False
+        except Exception as e:
+            self.log(f"Connections Graph ranking test failed: {e}")
+            return False
+    
+    def test_connections_graph_node_details(self) -> bool:
+        """Test GET /api/connections/graph/node/:id returns node details"""
+        try:
+            # First get a graph to find a node ID
+            graph_response = self.session.get(f"{self.base_url}/api/connections/graph")
+            if graph_response.status_code != 200:
+                return False
+            
+            graph_data = graph_response.json()
+            if not (graph_data.get('ok') and 'data' in graph_data):
+                return False
+            
+            nodes = graph_data['data'].get('nodes', [])
+            if not nodes:
+                return False
+            
+            # Test with first node
+            node_id = nodes[0]['id']
+            response = self.session.get(f"{self.base_url}/api/connections/graph/node/{node_id}")
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get('ok') and 'data' in data:
+                    node_details = data['data']
+                    # Check for node details structure
+                    required_fields = ['id', 'label', 'profile', 'influence_score']
+                    has_required = all(field in node_details for field in required_fields)
+                    
+                    self.log(f"Node details for {node_id}: {node_details.get('label', 'unknown')}")
+                    return has_required
+            return False
+        except Exception as e:
+            self.log(f"Connections Graph node details test failed: {e}")
+            return False
+    
     def admin_login(self) -> bool:
         """Login as admin and store token"""
         try:
