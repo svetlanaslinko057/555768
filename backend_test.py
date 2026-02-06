@@ -150,20 +150,38 @@ class ConnectionsDropdownTester:
             self.log(f"Connections Graph API test failed: {e}")
             return False
     
-    def test_early_signal_api(self) -> bool:
-        """Test /api/connections/early-signal/mock for badge detection"""
+    def test_connections_compare_api(self) -> bool:
+        """Test /api/connections/compare for Compare functionality"""
         try:
-            response = self.session.get(f"{self.base_url}/api/connections/early-signal/mock")
+            # Test compare with mock data
+            compare_data = {
+                "left": "test_user_1",
+                "right": "test_user_2"
+            }
+            response = self.session.post(
+                f"{self.base_url}/api/connections/compare",
+                json=compare_data,
+                headers={'Content-Type': 'application/json'}
+            )
             if response.status_code == 200:
                 data = response.json()
                 if data.get('ok') and 'data' in data:
-                    signal_data = data['data']
-                    # Check for badge field and valid values
-                    badge = signal_data.get('badge')
-                    return badge in ['breakout', 'rising', 'none']
+                    compare_result = data['data']
+                    # Check for compare structure
+                    required_fields = ['left', 'right', 'audience_overlap']
+                    has_required = all(field in compare_result for field in required_fields)
+                    
+                    # Check audience overlap structure
+                    if 'audience_overlap' in compare_result:
+                        overlap = compare_result['audience_overlap']
+                        overlap_fields = ['a_to_b', 'b_to_a', 'shared_users', 'jaccard_similarity']
+                        has_overlap_structure = all(field in overlap for field in overlap_fields)
+                        return has_required and has_overlap_structure
+                    
+                    return has_required
             return False
         except Exception as e:
-            self.log(f"Early Signal API test failed: {e}")
+            self.log(f"Connections Compare API test failed: {e}")
             return False
     
     def test_connections_graph_get(self) -> bool:
