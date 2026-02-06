@@ -73,34 +73,31 @@ class ConnectionsDropdownTester:
             self.log(f"Connections health check failed: {e}")
             return False
     
-    def test_scoring_api_stability(self) -> bool:
-        """Test /api/connections/score/mock for stable results"""
+    def test_connections_accounts_api(self) -> bool:
+        """Test /api/connections/accounts for Influencers tab"""
         try:
-            # Run scoring multiple times to check stability
-            results = []
-            for i in range(3):
-                response = self.session.get(f"{self.base_url}/api/connections/score/mock")
-                if response.status_code == 200:
-                    data = response.json()
-                    if data.get('ok') and 'data' in data:
-                        score_data = data['data']
-                        if 'influence_score' in score_data:
-                            results.append(score_data['influence_score'])
-                        else:
-                            return False
-                    else:
-                        return False
-                else:
-                    return False
-                time.sleep(0.5)  # Small delay between requests
-            
-            # Check if results are consistent (same structure, reasonable values)
-            if len(results) == 3:
-                # All should be reasonable score ranges
-                return all(0 <= score <= 1000 for score in results)
+            response = self.session.get(f"{self.base_url}/api/connections/accounts?limit=100")
+            if response.status_code == 200:
+                data = response.json()
+                if data.get('ok') and 'data' in data:
+                    accounts_data = data['data']
+                    # Check for accounts structure
+                    has_items = 'items' in accounts_data and isinstance(accounts_data['items'], list)
+                    
+                    items_count = len(accounts_data.get('items', []))
+                    self.log(f"Connections accounts: {items_count} accounts")
+                    
+                    # Check account structure if we have items
+                    if items_count > 0:
+                        first_account = accounts_data['items'][0]
+                        required_fields = ['author_id', 'handle', 'scores']
+                        has_required = all(field in first_account for field in required_fields)
+                        return has_items and has_required
+                    
+                    return has_items  # Even if no items, structure should be correct
             return False
         except Exception as e:
-            self.log(f"Scoring API test failed: {e}")
+            self.log(f"Connections accounts API test failed: {e}")
             return False
     
     def test_trends_api_correctness(self) -> bool:
