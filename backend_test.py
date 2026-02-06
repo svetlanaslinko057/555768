@@ -12,7 +12,7 @@ from datetime import datetime
 from typing import Dict, List, Optional, Any
 
 # Use production URL from frontend .env
-BACKEND_URL = "https://svetlana-connect.preview.emergentagent.com"
+BACKEND_URL = "https://deploy-connect-6.preview.emergentagent.com"
 
 class P22BackendTester:
     def __init__(self):
