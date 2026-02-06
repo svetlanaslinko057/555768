@@ -156,6 +156,7 @@ const TwitterAIPage = lazy(() => import("./pages/TwitterAIPage"));
 const ConnectionsPage = lazy(() => import("./pages/ConnectionsPage"));
 const ConnectionsDetailPage = lazy(() => import("./pages/ConnectionsDetailPage"));
 const ConnectionsEarlySignalPage = lazy(() => import("./pages/ConnectionsEarlySignalPage"));
+const ConnectionsGraphPage = lazy(() => import("./pages/ConnectionsGraphPage"));
 
 // S3.8.2 - Sentiment Admin Dashboard
 const AdminSentimentPage = lazy(() => import("./pages/admin/AdminSentimentPage"));
