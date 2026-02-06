@@ -17,7 +17,6 @@ BACKEND_URL = "https://deploy-connect-6.preview.emergentagent.com"
 class ConnectionsDropdownTester:
     def __init__(self):
         self.base_url = BACKEND_URL
-        self.admin_token = None
         self.tests_run = 0
         self.tests_passed = 0
         self.failed_tests = []
