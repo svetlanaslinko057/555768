@@ -407,6 +407,7 @@ export default function ConnectionsGraphPage() {
         body: JSON.stringify(filters),
       });
       const data = await res.json();
+      console.log('[Graph] API response:', { ok: data.ok, nodes: data.data?.nodes?.length, edges: data.data?.edges?.length });
       
       if (data.ok && data.data) {
         // Transform for ForceGraphCore
@@ -434,6 +435,7 @@ export default function ConnectionsGraphPage() {
             direction: e.direction,
           })),
         };
+        console.log('[Graph] Transformed data:', { nodes: transformed.nodes.length, links: transformed.links.length });
         setGraphData(transformed);
       }
     } catch (err) {
