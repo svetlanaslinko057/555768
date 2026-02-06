@@ -446,6 +446,12 @@ class P22BackendTester:
         self.run_test("Trends API /api/connections/trends/mock correctness", self.test_trends_api_correctness)
         self.run_test("Early Signal API /api/connections/early-signal/mock badge detection", self.test_early_signal_api)
         
+        # Connections Graph API Tests
+        self.run_test("Connections Graph GET /api/connections/graph", self.test_connections_graph_get)
+        self.run_test("Connections Graph POST /api/connections/graph with filters", self.test_connections_graph_post_filters)
+        self.run_test("Connections Graph ranking /api/connections/graph/ranking", self.test_connections_graph_ranking)
+        self.run_test("Connections Graph node details /api/connections/graph/node/:id", self.test_connections_graph_node_details)
+        
         # Admin Authentication
         admin_login_success = self.run_test("Admin login (admin/admin12345)", self.admin_login)
         
