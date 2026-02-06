@@ -317,55 +317,62 @@ const NodeDetailsPanel = ({ node, details, onClose }) => {
 };
 
 // ============================================================
-// RANKING SIDEBAR
+// RANKING BAR (Horizontal, top position)
 // ============================================================
 
-const RankingSidebar = ({ ranking, onNodeSelect, selectedId }) => {
+const RankingBar = ({ ranking, onNodeSelect, selectedId }) => {
   const [sortBy, setSortBy] = useState('influence');
 
   return (
-    <div className="w-72 bg-white border-l border-gray-200 flex flex-col">
-      <div className="p-4 border-b border-gray-200">
-        <h3 className="font-semibold text-gray-900 mb-2">Ranking</h3>
-        <div className="flex gap-1">
-          {['influence', 'early_signal'].map(s => (
-            <button
-              key={s}
-              onClick={() => setSortBy(s)}
-              className={`px-2 py-1 rounded text-xs font-medium transition-colors ${
-                sortBy === s ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-600'
-              }`}
-            >
-              {s === 'influence' ? 'Influence' : 'Signal'}
-            </button>
-          ))}
-        </div>
-      </div>
-      <div className="flex-1 overflow-y-auto">
-        {ranking?.items?.map((item, idx) => (
-          <div
-            key={item.id}
-            onClick={() => onNodeSelect(item.id)}
-            className={`p-3 border-b border-gray-100 cursor-pointer transition-colors ${
-              selectedId === item.id ? 'bg-blue-50' : 'hover:bg-gray-50'
-            }`}
-          >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-bold text-gray-400 w-5">{idx + 1}</span>
-                <span className="font-medium text-gray-900 text-sm">{item.label}</span>
-              </div>
-              <span className="text-sm text-gray-500">{Math.round(item.score)}</span>
+    <div className="bg-white border-b border-gray-200 px-4 py-3">
+      <div className="max-w-full mx-auto">
+        <div className="flex items-center gap-4">
+          {/* Title and Sort */}
+          <div className="flex items-center gap-3 shrink-0">
+            <h3 className="font-semibold text-gray-900 text-sm">Top Ranking</h3>
+            <div className="flex gap-1">
+              {['influence', 'early_signal'].map(s => (
+                <button
+                  key={s}
+                  onClick={() => setSortBy(s)}
+                  className={`px-2 py-1 rounded text-xs font-medium transition-colors ${
+                    sortBy === s ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  }`}
+                >
+                  {s === 'influence' ? 'Influence' : 'Signal'}
+                </button>
+              ))}
             </div>
-            {item.early_signal && item.early_signal !== 'none' && (
-              <span className={`ml-7 text-xs ${
-                item.early_signal === 'breakout' ? 'text-green-600' : 'text-yellow-600'
-              }`}>
-                {item.early_signal === 'breakout' ? 'Breakout' : 'Rising'}
-              </span>
-            )}
           </div>
-        ))}
+          
+          {/* Horizontal scroll ranking */}
+          <div className="flex-1 overflow-x-auto">
+            <div className="flex items-center gap-2">
+              {ranking?.items?.slice(0, 15).map((item, idx) => (
+                <button
+                  key={item.id}
+                  onClick={() => onNodeSelect(item.id)}
+                  className={`shrink-0 flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-colors ${
+                    selectedId === item.id 
+                      ? 'bg-blue-50 border-blue-300 text-blue-700' 
+                      : 'bg-gray-50 border-gray-200 text-gray-700 hover:bg-gray-100'
+                  }`}
+                >
+                  <span className="text-xs font-bold text-gray-400">{idx + 1}</span>
+                  <span className="font-medium text-sm whitespace-nowrap">{item.label}</span>
+                  <span className="text-xs text-gray-500">{Math.round(item.score)}</span>
+                  {item.early_signal && item.early_signal !== 'none' && (
+                    <span className={`text-xs ${
+                      item.early_signal === 'breakout' ? 'text-green-600' : 'text-yellow-600'
+                    }`}>
+                      {item.early_signal === 'breakout' ? '🚀' : '📈'}
+                    </span>
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
