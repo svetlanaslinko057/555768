@@ -441,6 +441,15 @@ export default function ConnectionsPage() {
               Graph
             </span>
           </Link>
+          <Link
+            to="/connections/radar"
+            className="px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors"
+          >
+            <span className="flex items-center gap-2">
+              <Radio className="w-4 h-4" />
+              Radar
+            </span>
+          </Link>
         </div>
         
         {/* Search and Filters */}
