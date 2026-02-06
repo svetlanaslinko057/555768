@@ -171,15 +171,15 @@ export async function connectionsGraphRoutes(fastify: FastifyInstance): Promise<
         id: account.author_id,
         label: `@${account.handle}`,
         profile: account.profile || 'retail',
-        influence_score: scoreData?.influence_score || 0,
+        influence_score: scoreData?.influence_score || account.scores?.influence_score || 0,
         trend: {
-          velocity: scoreData?.velocity_norm || 0,
-          acceleration: scoreData?.acceleration_norm || 0,
-          state: scoreData?.trend_state || 'stable'
+          velocity: scoreData?.velocity_norm || account.trend?.velocity_norm || 0,
+          acceleration: scoreData?.acceleration_norm || account.trend?.acceleration_norm || 0,
+          state: scoreData?.trend_state || account.trend?.state || 'stable'
         },
         early_signal: {
-          badge: scoreData?.early_signal_badge || 'none',
-          score: scoreData?.early_signal_score || 0,
+          badge: scoreData?.early_signal_badge || account.early_signal?.badge || 'none',
+          score: scoreData?.early_signal_score || account.early_signal?.score || 0,
           confidence: scoreData?.confidence || 0.5
         },
         connected_nodes: connectedNodes,
