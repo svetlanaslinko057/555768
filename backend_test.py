@@ -520,15 +520,15 @@ class ConnectionsDropdownTester:
 
 def main():
     """Main test execution"""
-    tester = P22BackendTester()
+    tester = ConnectionsDropdownTester()
     results = tester.run_all_tests()
     
     # Exit with appropriate code
     if results['success_rate'] >= 80:
-        print(f"\n🎉 P2.2 Backend tests PASSED with {results['success_rate']:.1f}% success rate")
+        print(f"\n🎉 Connections Dropdown Backend tests PASSED with {results['success_rate']:.1f}% success rate")
         return 0
     else:
-        print(f"\n💥 P2.2 Backend tests FAILED with {results['success_rate']:.1f}% success rate")
+        print(f"\n💥 Connections Dropdown Backend tests FAILED with {results['success_rate']:.1f}% success rate")
         return 1
 
 if __name__ == "__main__":
