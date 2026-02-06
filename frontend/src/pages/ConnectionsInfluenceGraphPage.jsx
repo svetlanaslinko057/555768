@@ -368,44 +368,54 @@ export default function ConnectionsInfluenceGraphPage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`${BACKEND_URL}/api/connections/graph`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(filters),
+      // Use GET with query params for new API
+      const params = new URLSearchParams({
+        limit: filters.limit_nodes?.toString() || '50',
       });
+      if (filters.profiles?.length) params.append('profile_types', filters.profiles.join(','));
+      if (filters.early_signal?.length) params.append('early_signals', filters.early_signal.join(','));
+      if (filters.risk_level?.length) params.append('risk_levels', filters.risk_level.join(','));
+      
+      const res = await fetch(`${BACKEND_URL}/api/connections/graph?${params}`);
       const data = await res.json();
       
-      if (data.ok && data.data) {
+      // New API format: nodes/edges at top level, not nested in data
+      if (data.ok && data.nodes) {
         const transformed = {
-          nodes: data.data.nodes.map(n => ({
+          nodes: data.nodes.map(n => ({
             id: n.id,
-            label: n.label,
-            displayName: n.label,
-            profile: n.profile,
+            label: n.display_name || `@${n.handle}`,
+            handle: n.handle,
+            displayName: n.display_name,
+            profile: n.profile_type,
             influence_score: n.influence_score,
             early_signal: n.early_signal,
             risk_level: n.risk_level,
-            trend_state: n.trend_state,
             color: n.color,
             size: n.size,
             val: n.size || 10,
           })),
-          links: data.data.edges.map(e => ({
+          links: data.edges.map(e => ({
             id: e.id,
             source: e.source,
             target: e.target,
             from: e.source,
             to: e.target,
-            type: e.type,
+            type: e.edge_type,
             weight: e.weight,
             strength: e.strength,
-            direction: e.direction === 'outbound' ? 'OUT' : e.direction === 'inbound' ? 'IN' : 'BOTH',
+            jaccard: e.jaccard,
+            shared: e.shared_count,
           })),
         };
         setGraphData(transformed);
+        console.log('[Graph] Loaded:', data.stats);
+      } else {
+        console.error('[Graph] API error:', data);
       }
     } catch (err) {
       setError(err.message);
+      console.error('[Graph] Fetch error:', err);
     }
     setLoading(false);
   }, [filters]);
