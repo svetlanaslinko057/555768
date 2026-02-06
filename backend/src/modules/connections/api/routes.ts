@@ -1416,9 +1416,9 @@ export async function registerConnectionsRoutes(app: FastifyInstance): Promise<v
   // CONNECTIONS GRAPH API
   // ============================================================
   
-  // Register graph routes
-  const { connectionsGraphRoutes } = await import('../core/graph/routes.js');
-  await app.register(connectionsGraphRoutes);
+  // Register graph routes (new full implementation)
+  const { graphRoutes } = await import('./graph.routes.js');
+  await app.register(graphRoutes);
 
   console.log('[Connections] API routes registered at /api/connections');
   console.log('[Connections] Graph API registered at /api/connections/graph');
