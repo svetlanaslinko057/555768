@@ -46,7 +46,16 @@ export function Sidebar({ globalState }) {
       ]
     },
     { path: '/', label: 'Dashboard', icon: '🏠' },
-    { path: '/connections', label: 'Connections', icon: '🔗' },
+    // Connections group with children (Influencers + Graph)
+    { 
+      id: 'connections',
+      label: 'Connections', 
+      icon: '🔗',
+      children: [
+        { path: '/connections', label: 'Influencers', icon: '👥' },
+        { path: '/connections/graph', label: 'Graph', icon: '🕸️' },
+      ]
+    },
   ];
 
   return (
