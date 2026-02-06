@@ -2,7 +2,7 @@
  * ConnectionsInfluenceGraphPage - Influence Graph Visualization
  * 
  * Uses ForceGraphCore from existing graph engine
- * with full filtering, ranking sidebar, and node details panel
+ * with full filtering, ranking table below, and node details panel
  */
 import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
@@ -218,7 +218,7 @@ const NodeDetailsPanel = ({ node, details, onClose }) => {
       </div>
 
       {/* Content */}
-      <div className="p-4 space-y-4 max-h-[500px] overflow-y-auto">
+      <div className="p-4 space-y-4 max-h-[400px] overflow-y-auto">
         {/* Influence Score */}
         <div>
           <div className="flex items-center gap-2 text-sm text-gray-500 mb-1">
@@ -244,33 +244,6 @@ const NodeDetailsPanel = ({ node, details, onClose }) => {
           </span>
         </div>
 
-        {/* Risk */}
-        <div>
-          <div className="text-sm text-gray-500 mb-1">Risk Level</div>
-          <div className="flex items-center gap-2">
-            <div className={`w-2 h-2 rounded-full ${
-              node.risk_level === 'low' ? 'bg-green-500' :
-              node.risk_level === 'medium' ? 'bg-yellow-500' :
-              'bg-red-500'
-            }`} />
-            <span className="text-sm capitalize">{node.risk_level}</span>
-          </div>
-        </div>
-
-        {/* Trend */}
-        <div>
-          <div className="text-sm text-gray-500 mb-1">Trend State</div>
-          <span className={`text-sm font-medium capitalize ${
-            node.trend_state === 'growing' ? 'text-green-600' :
-            node.trend_state === 'cooling' ? 'text-red-600' :
-            'text-gray-600'
-          }`}>
-            {node.trend_state === 'growing' ? 'Growing' :
-             node.trend_state === 'cooling' ? 'Cooling' :
-             'Stable'}
-          </span>
-        </div>
-
         {/* Connected Nodes */}
         {details?.connected_nodes?.length > 0 && (
           <div>
@@ -278,7 +251,7 @@ const NodeDetailsPanel = ({ node, details, onClose }) => {
               <Users className="w-4 h-4" />
               Connected ({details.connected_nodes.length})
             </div>
-            <div className="space-y-2 max-h-40 overflow-y-auto">
+            <div className="space-y-1 max-h-32 overflow-y-auto">
               {details.connected_nodes.slice(0, 5).map((conn, i) => (
                 <div key={i} className="flex items-center justify-between text-sm bg-gray-50 rounded px-2 py-1">
                   <span className="text-gray-700">{conn.label}</span>
@@ -289,26 +262,8 @@ const NodeDetailsPanel = ({ node, details, onClose }) => {
           </div>
         )}
 
-        {/* Why Connected */}
-        {details?.why_connected?.length > 0 && (
-          <div>
-            <div className="text-sm text-gray-500 mb-2">Why Connected</div>
-            <ul className="space-y-1">
-              {details.why_connected.map((reason, i) => (
-                <li key={i} className="text-xs text-gray-600 flex items-start gap-1">
-                  <span className="text-blue-500">•</span>
-                  {reason}
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-
         {/* Action */}
-        <Link 
-          to={`/connections/${node.id}`}
-          className="block w-full"
-        >
+        <Link to={`/connections/${node.id}`} className="block w-full">
           <Button className="w-full">View Full Profile</Button>
         </Link>
       </div>
@@ -317,62 +272,71 @@ const NodeDetailsPanel = ({ node, details, onClose }) => {
 };
 
 // ============================================================
-// RANKING BAR (Horizontal, top position)
+// RANKING TABLE (Below graph)
 // ============================================================
 
-const RankingBar = ({ ranking, onNodeSelect, selectedId }) => {
+const RankingTable = ({ ranking, onNodeSelect, selectedId }) => {
   const [sortBy, setSortBy] = useState('influence');
 
+  if (!ranking?.items?.length) return null;
+
   return (
-    <div className="bg-white border-b border-gray-200 px-4 py-3">
-      <div className="max-w-full mx-auto">
-        <div className="flex items-center gap-4">
-          {/* Title and Sort */}
-          <div className="flex items-center gap-3 shrink-0">
-            <h3 className="font-semibold text-gray-900 text-sm">Top Ranking</h3>
-            <div className="flex gap-1">
-              {['influence', 'early_signal'].map(s => (
-                <button
-                  key={s}
-                  onClick={() => setSortBy(s)}
-                  className={`px-2 py-1 rounded text-xs font-medium transition-colors ${
-                    sortBy === s ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                  }`}
-                >
-                  {s === 'influence' ? 'Influence' : 'Signal'}
-                </button>
-              ))}
-            </div>
-          </div>
-          
-          {/* Horizontal scroll ranking */}
-          <div className="flex-1 overflow-x-auto">
-            <div className="flex items-center gap-2">
-              {ranking?.items?.slice(0, 15).map((item, idx) => (
-                <button
-                  key={item.id}
-                  onClick={() => onNodeSelect(item.id)}
-                  className={`shrink-0 flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-colors ${
-                    selectedId === item.id 
-                      ? 'bg-blue-50 border-blue-300 text-blue-700' 
-                      : 'bg-gray-50 border-gray-200 text-gray-700 hover:bg-gray-100'
-                  }`}
-                >
-                  <span className="text-xs font-bold text-gray-400">{idx + 1}</span>
-                  <span className="font-medium text-sm whitespace-nowrap">{item.label}</span>
-                  <span className="text-xs text-gray-500">{Math.round(item.score)}</span>
-                  {item.early_signal && item.early_signal !== 'none' && (
-                    <span className={`text-xs ${
-                      item.early_signal === 'breakout' ? 'text-green-600' : 'text-yellow-600'
-                    }`}>
-                      {item.early_signal === 'breakout' ? '🚀' : '📈'}
-                    </span>
-                  )}
-                </button>
-              ))}
-            </div>
-          </div>
+    <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+      <div className="p-4 border-b border-gray-200 flex items-center justify-between">
+        <h3 className="font-semibold text-gray-900">Top Influencers</h3>
+        <div className="flex gap-1">
+          {['influence', 'early_signal'].map(s => (
+            <button
+              key={s}
+              onClick={() => setSortBy(s)}
+              className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
+                sortBy === s ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              {s === 'influence' ? 'Influence' : 'Signal'}
+            </button>
+          ))}
         </div>
+      </div>
+      <div className="overflow-x-auto">
+        <table className="w-full">
+          <thead className="bg-gray-50">
+            <tr>
+              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">#</th>
+              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Account</th>
+              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Score</th>
+              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Signal</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-100">
+            {ranking.items.slice(0, 10).map((item, idx) => (
+              <tr 
+                key={item.id}
+                onClick={() => onNodeSelect(item.id)}
+                className={`cursor-pointer transition-colors ${
+                  selectedId === item.id ? 'bg-blue-50' : 'hover:bg-gray-50'
+                }`}
+              >
+                <td className="px-4 py-2 text-sm text-gray-400 font-medium">{idx + 1}</td>
+                <td className="px-4 py-2">
+                  <span className="font-medium text-gray-900">{item.label}</span>
+                </td>
+                <td className="px-4 py-2 text-sm text-gray-600">{Math.round(item.score)}</td>
+                <td className="px-4 py-2">
+                  {item.early_signal && item.early_signal !== 'none' ? (
+                    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${
+                      item.early_signal === 'breakout' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
+                    }`}>
+                      {item.early_signal === 'breakout' ? 'Breakout' : 'Rising'}
+                    </span>
+                  ) : (
+                    <span className="text-gray-400 text-xs">—</span>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );
@@ -412,7 +376,6 @@ export default function ConnectionsInfluenceGraphPage() {
       const data = await res.json();
       
       if (data.ok && data.data) {
-        // Transform for ForceGraphCore
         const transformed = {
           nodes: data.data.nodes.map(n => ({
             id: n.id,
@@ -443,7 +406,6 @@ export default function ConnectionsInfluenceGraphPage() {
       }
     } catch (err) {
       setError(err.message);
-      console.error('Graph fetch error:', err);
     }
     setLoading(false);
   }, [filters]);
@@ -497,35 +459,26 @@ export default function ConnectionsInfluenceGraphPage() {
   }, [graphData.nodes, fetchNodeDetails]);
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col">
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <div className="bg-white border-b border-gray-200">
-        <div className="max-w-full mx-auto px-6 py-4">
+        <div className="max-w-7xl mx-auto px-6 py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <div className="p-2 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl">
                 <Network className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-gray-900">Connections Graph</h1>
-                <p className="text-sm text-gray-500">Influence relationships visualization</p>
+                <h1 className="text-2xl font-bold text-gray-900">Connections Graph</h1>
+                <p className="text-sm text-gray-500 mt-1">Influence relationships visualization</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
-              {/* Stats */}
-              <div className="hidden md:flex items-center gap-4 px-4 py-2 bg-gray-50 rounded-lg text-sm">
+              <div className="hidden md:flex items-center gap-3 px-4 py-2 bg-gray-50 rounded-lg text-sm">
                 <span><strong>{graphData.nodes.length}</strong> nodes</span>
                 <span className="text-gray-300">|</span>
                 <span><strong>{graphData.links.length}</strong> edges</span>
               </div>
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => setShowFilters(!showFilters)}
-              >
-                <Filter className="w-4 h-4 mr-1" />
-                Filters
-              </Button>
               <Button 
                 variant="outline" 
                 size="sm"
@@ -536,42 +489,47 @@ export default function ConnectionsInfluenceGraphPage() {
               </Button>
             </div>
           </div>
-
-          {/* Navigation Tabs */}
-          <div className="flex gap-2 mt-4">
-            <Link 
-              to="/connections"
-              className="px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors flex items-center gap-2"
-            >
-              <Users className="w-4 h-4" />
-              Influencers
-            </Link>
-            <span className="px-4 py-2 rounded-lg text-sm font-medium bg-gray-900 text-white flex items-center gap-2">
-              <Network className="w-4 h-4" />
-              Graph
-            </span>
-            <Link 
-              to="/connections/radar"
-              className="px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors flex items-center gap-2"
-            >
-              <Radio className="w-4 h-4" />
-              Radar
-            </Link>
-          </div>
         </div>
       </div>
 
-      {/* Ranking Bar (horizontal, under header) */}
-      <RankingBar
-        ranking={ranking}
-        onNodeSelect={handleRankingSelect}
-        selectedId={selectedNode?.id}
-      />
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-6 py-6">
+        {/* Navigation Tabs */}
+        <div className="flex items-center gap-2 mb-6">
+          <Link 
+            to="/connections"
+            className="px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors flex items-center gap-2"
+          >
+            <Users className="w-4 h-4" />
+            Influencers
+          </Link>
+          <span className="px-4 py-2 rounded-lg text-sm font-medium bg-gray-900 text-white flex items-center gap-2">
+            <Network className="w-4 h-4" />
+            Graph
+          </span>
+          <Link 
+            to="/connections/radar"
+            className="px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors flex items-center gap-2"
+          >
+            <Radio className="w-4 h-4" />
+            Radar
+          </Link>
+          
+          {/* Filters button */}
+          <div className="ml-auto">
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => setShowFilters(!showFilters)}
+            >
+              <Filter className="w-4 h-4 mr-1" />
+              Filters
+            </Button>
+          </div>
+        </div>
 
-      {/* Main Content - Graph takes full width */}
-      <div className="flex-1 p-4">
-        {/* Graph Container with proper boundaries */}
-        <div className="relative bg-[#0a0e1a] rounded-xl overflow-hidden" style={{ height: 'calc(100vh - 280px)', minHeight: '500px' }}>
+        {/* Graph Container */}
+        <div className="relative bg-[#0a0e1a] rounded-xl overflow-hidden mb-6" style={{ height: '500px' }}>
           {loading ? (
             <div className="flex items-center justify-center h-full">
               <div className="text-center">
@@ -592,8 +550,8 @@ export default function ConnectionsInfluenceGraphPage() {
               onNodeClick={handleNodeClick}
               selectedNodeId={selectedNode?.id}
               fitOnLoad={true}
-              width={typeof window !== 'undefined' ? window.innerWidth - 32 : 1200}
-              height={typeof window !== 'undefined' ? Math.max(500, window.innerHeight - 280) : 600}
+              width={1200}
+              height={500}
             />
           )}
 
@@ -619,11 +577,11 @@ export default function ConnectionsInfluenceGraphPage() {
             <div className="text-gray-400 font-medium mb-2">Legend</div>
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 rounded-full bg-green-500" />
-              <span className="text-gray-300">Breakout Signal</span>
+              <span className="text-gray-300">Breakout</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 rounded-full bg-yellow-500" />
-              <span className="text-gray-300">Rising Signal</span>
+              <span className="text-gray-300">Rising</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 rounded-full bg-indigo-500" />
@@ -639,6 +597,13 @@ export default function ConnectionsInfluenceGraphPage() {
             </div>
           </div>
         </div>
+
+        {/* Ranking Table (Below Graph) */}
+        <RankingTable
+          ranking={ranking}
+          onNodeSelect={handleRankingSelect}
+          selectedId={selectedNode?.id}
+        />
       </div>
     </div>
   );
