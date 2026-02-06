@@ -424,6 +424,25 @@ export default function ConnectionsPage() {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-6 py-6">
+        {/* Sub-navigation tabs */}
+        <div className="flex items-center gap-2 mb-6">
+          <span className="px-4 py-2 rounded-lg text-sm font-medium bg-gray-900 text-white">
+            <span className="flex items-center gap-2">
+              <Users className="w-4 h-4" />
+              Influencers
+            </span>
+          </span>
+          <Link
+            to="/connections/graph"
+            className="px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors"
+          >
+            <span className="flex items-center gap-2">
+              <Network className="w-4 h-4" />
+              Graph
+            </span>
+          </Link>
+        </div>
+        
         {/* Search and Filters */}
         <div className="flex items-center gap-4 mb-6">
           <div className="relative flex-1 max-w-md">
