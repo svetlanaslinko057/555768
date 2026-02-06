@@ -561,10 +561,17 @@ export default function ConnectionsInfluenceGraphPage() {
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="flex-1 flex relative">
-        {/* Graph Container */}
-        <div className="flex-1 relative bg-[#0a0e1a]">
+      {/* Ranking Bar (horizontal, under header) */}
+      <RankingBar
+        ranking={ranking}
+        onNodeSelect={handleRankingSelect}
+        selectedId={selectedNode?.id}
+      />
+
+      {/* Main Content - Graph takes full width */}
+      <div className="flex-1 p-4">
+        {/* Graph Container with proper boundaries */}
+        <div className="relative bg-[#0a0e1a] rounded-xl overflow-hidden" style={{ height: 'calc(100vh - 280px)', minHeight: '500px' }}>
           {loading ? (
             <div className="flex items-center justify-center h-full">
               <div className="text-center">
@@ -585,8 +592,8 @@ export default function ConnectionsInfluenceGraphPage() {
               onNodeClick={handleNodeClick}
               selectedNodeId={selectedNode?.id}
               fitOnLoad={true}
-              width={typeof window !== 'undefined' ? window.innerWidth - 288 : 1200}
-              height={typeof window !== 'undefined' ? window.innerHeight - 200 : 600}
+              width={typeof window !== 'undefined' ? window.innerWidth - 32 : 1200}
+              height={typeof window !== 'undefined' ? Math.max(500, window.innerHeight - 280) : 600}
             />
           )}
 
@@ -632,13 +639,6 @@ export default function ConnectionsInfluenceGraphPage() {
             </div>
           </div>
         </div>
-
-        {/* Ranking Sidebar */}
-        <RankingSidebar
-          ranking={ranking}
-          onNodeSelect={handleRankingSelect}
-          selectedId={selectedNode?.id}
-        />
       </div>
     </div>
   );
