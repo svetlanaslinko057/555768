@@ -1,10 +1,10 @@
 # Connections Module - PRD
 
 ## Original Problem Statement
-1. Развернуть проект Connections Module с GitHub
-2. Сделать Connections как dropdown в sidebar (как Sentiment) с 2 под-вкладками:
-   - **Influencers** - таблица аккаунтов
-   - **Graph** - граф связей между инфлюенсерами
+Развернуть Connections Module с GitHub и реализовать полную навигационную структуру:
+- Connections как dropdown в sidebar (как Sentiment)
+- 3 под-вкладки: **Influencers**, **Graph**, **Radar**
+- Graph с полной логикой фильтров из первой итерации
 
 ## Архитектура
 
@@ -17,9 +17,10 @@ Sidebar:
 │   ├── Twitter Feed
 │   └── Twitter AI
 ├── Dashboard
-└── Connections (dropdown)  ← НОВОЕ
+└── Connections (dropdown)  ← РЕАЛИЗОВАНО
     ├── Influencers → /connections
-    └── Graph → /connections/graph
+    ├── Graph → /connections/graph
+    └── Radar → /connections/radar
 ```
 
 ### Tech Stack
@@ -31,36 +32,47 @@ Sidebar:
 
 ### Sidebar Navigation
 - ✅ Connections как dropdown (как Sentiment)
-- ✅ Influencers и Graph под-вкладки
+- ✅ 3 под-вкладки: Influencers, Graph, Radar
 - ✅ Connections по умолчанию раскрыт
 
 ### Influencers Page (/connections)
+- ✅ Навигационные табы: Influencers | Graph | Radar
 - ✅ Таблица аккаунтов с Influence Score, Risk, Followers
 - ✅ Поиск и фильтры
 - ✅ Compare функционал
-- ✅ Tabs: Influencers (активный) | Graph
 
 ### Graph Page (/connections/graph)
-- ✅ ForceGraphCore визуализация (тот же что в Graph Intelligence → Routes)
-- ✅ 30 nodes, 430+ edges
-- ✅ Tabs: Influencers | Graph (активный)
-- ✅ Refresh кнопка
-- ✅ Legend с цветовой кодировкой
+- ✅ **ForceGraphCore** визуализация (30 nodes, 435 edges)
+- ✅ **Filter Panel**:
+  - NODES: Profile (Retail/Influencer/Whale), Early Signal (Breakout/Rising/None), Risk Level (Low/Medium/High)
+  - EDGES: Strength (Low/Medium/High)
+  - VIEW: Hide isolated nodes, Max nodes slider
+- ✅ **Ranking Sidebar**: сортировка по Influence/Signal
+- ✅ **Node Details Panel**: Influence Score, Early Signal, Risk, Trend, Connected nodes, Why Connected
+- ✅ **Legend** с цветовой кодировкой
 
-### Backend API
-- GET /api/connections/graph - полный граф
-- POST /api/connections/graph - граф с фильтрами
+### Radar Page (/connections/radar)
+- ✅ Навигационные табы: Influencers | Graph | Radar
+- ✅ Scatter plot с Alpha Zone
+- ✅ Фильтры по Profile и Signal
+- ✅ Compare Mode
+- ✅ Radar/Table view toggle
+
+## Backend API
+- GET/POST /api/connections/graph - граф с фильтрами
 - GET /api/connections/graph/ranking - ранкинг
 - GET /api/connections/graph/node/:id - детали узла
 
 ## Тестирование
-- Frontend: 100%
-- Backend: 83%
+- Frontend: **100%**
+- Navigation: **100%**
+- Visualization: **100%**
+- Interaction: **100%**
 
 ## MOCK данные
 Граф работает на расчётных данных (generateMockAccounts). Twitter API не подключен.
 
 ## Next Tasks
-1. Интеграция Twitter API для реальных audience overlaps
-2. Улучшить Compare функционал
-3. Добавить фильтры в Graph page
+1. Интеграция Twitter API для реальных overlaps
+2. Cluster detection для группировки связанных инфлюенсеров
+3. Дополнительные layouts (radial, clustered)
