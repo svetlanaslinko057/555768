@@ -4,7 +4,7 @@ import { useState } from 'react';
 
 export function Sidebar({ globalState }) {
   const location = useLocation();
-  const [expandedGroups, setExpandedGroups] = useState(['sentiment']); // Sentiment expanded by default
+  const [expandedGroups, setExpandedGroups] = useState(['sentiment', 'connections']); // Sentiment & Connections expanded by default
 
   const isActive = (path) => location.pathname === path;
   
