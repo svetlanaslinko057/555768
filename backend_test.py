@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-P2.2 Final Readiness Check - Backend API Testing
-Tests all backend endpoints for mathematical stability, behavioral logic, alerts engine, and admin control plane.
+Connections Dropdown Testing - Backend API Testing
+Tests backend APIs for Connections dropdown functionality: Influencers and Graph tabs
 """
 
 import requests
@@ -14,7 +14,7 @@ from typing import Dict, List, Optional, Any
 # Use production URL from frontend .env
 BACKEND_URL = "https://deploy-connect-6.preview.emergentagent.com"
 
-class P22BackendTester:
+class ConnectionsDropdownTester:
     def __init__(self):
         self.base_url = BACKEND_URL
         self.admin_token = None
