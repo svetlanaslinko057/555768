@@ -90,13 +90,13 @@ export function buildConnectionsGraph(
     });
   }
   
-  if (filters.risk_level && filters.risk_level.length > 0) {
+  if (filters.risk_level?.length) {
     filteredAccounts = filteredAccounts.filter(a => 
       filters.risk_level!.includes(a.scores?.risk_level || 'low')
     );
   }
   
-  if (filters.early_signal && filters.early_signal.length > 0) {
+  if (filters.early_signal?.length) {
     filteredAccounts = filteredAccounts.filter(a => 
       filters.early_signal!.includes(a.early_signal?.badge || 'none')
     );
