@@ -272,7 +272,7 @@ function App() {
               {/* Connections - Influence Scoring */}
               <Route path="/connections" element={<ConnectionsPage />} />
               <Route path="/connections/radar" element={<ConnectionsEarlySignalPage />} />
-              <Route path="/connections/graph" element={<ConnectionsGraphPage />} />
+              <Route path="/connections/graph" element={<ConnectionsInfluenceGraphPage />} />
               <Route path="/connections/:authorId" element={<ConnectionsDetailPage />} />
               {/* FREEZE v2.3: Unified Market Hub (replaces /market + /market-signals) */}
               <Route path="/market" element={<MarketHub />} />
